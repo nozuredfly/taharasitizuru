@@ -59,6 +59,39 @@ html,body{margin:0;height:100%;font-family:-apple-system,"Hiragino Sans","Noto S
 #mbox .acts button{flex:1;padding:10px;font-size:15px;border-radius:10px;border:none;background:#eee}
 #mbox .acts .pri{background:#1f5f3f;color:#fff}
 #mres{margin-top:10px;padding:8px;background:#f4f7f5;border-radius:8px;white-space:pre-wrap;font-size:13px}
+/* 圃場管理 */
+#dbar{position:absolute;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:1001;display:none;flex-direction:column;gap:6px;background:rgba(25,113,194,.96);color:#fff;border-radius:12px;padding:10px;font-size:15px;font-weight:bold}
+#dbar .dbtns{display:flex;gap:6px}
+#dbar button{flex:1;font-size:13px;padding:9px 4px;border:none;border-radius:8px;background:#fff;color:#1971c2;font-weight:bold;white-space:nowrap}
+#dbar button.pri{background:#ffd43b;color:#333}
+.mini{flex:0 0 auto;padding:6px 10px;border:none;border-radius:8px;background:#e7f5ff;color:#1971c2;font-weight:bold;font-size:14px}
+.pbtn{flex:0 0 auto;width:34px;height:30px;margin-right:6px;border:1.5px solid #1971c2;border-radius:8px;background:#fff;font-size:15px;opacity:.45}
+.pbtn.on{background:#1971c2;opacity:1}
+.row .ord{flex:0 0 24px;width:24px;height:24px;margin-right:8px;border-radius:50%;background:#1971c2;color:#fff;font-size:13px;font-weight:bold;display:flex;align-items:center;justify-content:center}
+.plbl{background:#1971c2!important;color:#fff!important;border-color:#1971c2!important}
+.fdim{opacity:.25}
+.pop .pl{background:#1971c2}
+.note2{color:#2f9e44;font-size:12px;margin-top:4px}
+.shapeBtn{margin-top:8px;width:100%;padding:9px;font-size:14px;border:1px dashed #1971c2;border-radius:10px;background:#e7f5ff;color:#1971c2;font-weight:bold}
+.dvx{width:14px;height:14px;border-radius:50%;background:#ffd43b;border:2px solid #1971c2}
+#fhint{position:absolute;left:8px;right:64px;bottom:calc(env(safe-area-inset-bottom) + 24px);z-index:999;display:none;align-items:center;gap:6px;background:rgba(47,158,68,.95);color:#fff;border-radius:10px;padding:8px 10px;font-size:14px;font-weight:bold;flex-wrap:wrap}
+#fhint span{flex:1}
+#fhint button{font-size:13px;padding:6px 8px;border:none;border-radius:8px;background:#fff;color:#2f9e44;font-weight:bold}
+.fm{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:12px}
+.fm.open{display:flex}
+.fbox{background:#fff;border-radius:14px;padding:16px;width:100%;max-width:440px;max-height:90vh;overflow:auto;font-size:14px}
+.fbox h3{margin:0 0 8px;font-size:17px}
+.fbox label{display:block;margin:10px 0 4px;font-weight:bold}
+.fbox input,.fbox textarea{width:100%;font-size:16px;padding:8px 10px;border:1px solid #ccc;border-radius:8px;font-family:inherit}
+.fbox .acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.fbox .acts button{flex:1;padding:10px;font-size:15px;border-radius:10px;border:none;background:#eee;white-space:nowrap}
+.fbox .acts .pri{background:#2f9e44;color:#fff}
+#fst{display:flex;gap:6px}
+#fst button{flex:1;padding:10px 4px;font-size:15px;border:none;border-radius:10px;font-weight:bold}
+.fpin{width:28px;height:28px;border-radius:7px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:15px}
+.flbl{position:absolute;left:31px;top:4px;background:rgba(255,255,255,.92);border:1.5px solid;border-radius:6px;padding:1px 5px;font-size:12px;font-weight:bold;white-space:nowrap}
+.stb{display:inline-block;color:#fff;border:none;border-radius:12px;padding:3px 9px;font-size:12px;font-weight:bold;flex:0 0 auto;min-width:56px}
+.pop .sbtn{color:#fff;font-weight:bold}
 .cur{color:#555;font-size:13px;background:#fffbe6;padding:6px 8px;border-radius:8px}
 </style>
 </head>
@@ -70,6 +103,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,"Hiragino Sans","Noto S
 </div>
 <div id="sug"></div>
 <div id="fab">
+  <button class="btn" id="fieldBtn" title="圃場の登録" style="background:#2f9e44">🌾圃場</button>
   <button class="btn" id="popBtn" title="人口表示" style="opacity:.5">人口</button>
   <button class="btn" id="kzBtn" title="小字表示">小字</button>
   <button class="btn" id="locBtn" title="現在地">現在地</button>
@@ -79,6 +113,8 @@ html,body{margin:0;height:100%;font-family:-apple-system,"Hiragino Sans","Noto S
     <button data-t="town" class="on">町</button>
     <button data-t="chiku">地区（自治会）</button>
     <button data-t="koku">校区</button>
+    <button data-t="today">📅予定</button>
+    <button data-t="field">🌾圃場</button>
   </div>
   <div id="ph">
     <b id="cnt"></b>
@@ -91,10 +127,43 @@ html,body{margin:0;height:100%;font-family:-apple-system,"Hiragino Sans","Noto S
     </select>
     <button id="popUpd">人口更新</button>
     <button id="reset">チェック解除</button>
+    <button id="tprev" class="tonly">◀前日</button>
+    <button id="ttoday" class="tonly">今日</button>
+    <button id="tnext" class="tonly">翌日▶</button>
+    <button id="tsum" class="tonly">まとめコピー</button>
+    <button id="troute" class="tonly">巡回ルート</button>
+    <button id="tonlyBtn" class="tonly">地図：予定だけ</button>
+    <button id="fcopy" class="fonly">表コピー</button>
+    <button id="fexp" class="fonly">バックアップ</button>
+    <button id="fimp" class="fonly">復元</button>
+    <input type="file" id="ffile" accept=".json,application/json" style="display:none">
     <button id="close">閉じる</button>
   </div>
   <div id="list"></div>
 </div>
+<div id="fhint"><span>🌾 地図をタップして圃場を登録</span><button id="fpoly">⬠囲んで登録</button><button id="fhere">現在地で登録</button><button id="fend">終了</button></div>
+<div id="dbar"><div id="dinfo">⬠ 圃場の角を順にタップ</div><div class="dbtns"><button id="dundo">1点戻す</button><button id="dgps">📍現在地を追加</button><button id="dok" class="pri">完成</button><button id="dcancel">やめる</button></div></div>
+<div id="fmodal" class="fm"><div class="fbox">
+  <h3 id="ftitle">圃場の登録</h3>
+  <label>圃場名</label><input id="fname" placeholder="例：浦町 川向">
+  <label>作物・品種</label><input id="fcrop" list="cropList" placeholder="例：コシヒカリ">
+  <label>面積（a）</label><input id="farea" type="number" inputmode="decimal" step="0.1" placeholder="例：30">
+  <div class="note2" id="fareaNote"></div>
+  <button type="button" id="fshape" class="shapeBtn">⬠ 形を描く</button>
+  <label>作業内容</label><input id="fwork" list="workList" placeholder="例：代かき">
+  <label>状態</label><div id="fst"><button data-k="todo">未着手</button><button data-k="doing">作業中</button><button data-k="done">完了</button></div>
+  <label>作業予定日</label><div style="display:flex;gap:6px"><input id="fplan" type="date" style="flex:1"><button type="button" id="fplanT" class="mini">今日</button><button type="button" id="fplanC" class="mini">なし</button></div>
+  <label>メモ</label><textarea id="fmemo" rows="2"></textarea>
+  <div class="cur" id="fpos" style="margin-top:10px"></div>
+  <div class="acts">
+    <button class="pri" id="fsave">保存</button>
+    <button id="fmove">位置を修正</button>
+    <button id="fdel" style="background:#ffe3e3;color:#c92a2a">削除</button>
+    <button id="fclose">閉じる</button>
+  </div>
+</div></div>
+<datalist id="cropList"><option>コシヒカリ</option><option>あいちのかおり</option><option>ミネアサヒ</option><option>もち米</option><option>キャベツ</option><option>ブロッコリー</option><option>自然薯</option></datalist>
+<datalist id="workList"><option>耕起</option><option>荒起こし</option><option>代かき</option><option>田植え</option><option>除草</option><option>草刈り</option><option>追肥</option><option>防除</option><option>水管理</option><option>稲刈り</option><option>定植</option><option>収穫</option></datalist>
 <div id="modal"><div id="mbox">
   <h3>人口データの更新</h3>
   <div class="cur" id="mcur"></div>
@@ -295,6 +364,34 @@ function renderList() {
   document.getElementById('reset').style.display = tab === 'town' ? '' : 'none';
   const L2 = document.getElementById('list');
   const dist = it => here && it.pos ? ` ${km(here[0], here[1], it.pos[0], it.pos[1]).toFixed(1)}km` : '';
+  const isF = tab === 'field', isT = tab === 'today';
+  document.querySelectorAll('.fonly').forEach(b => b.style.display = isF ? '' : 'none');
+  document.querySelectorAll('.tonly').forEach(b => b.style.display = isT ? '' : 'none');
+  document.getElementById('popUpd').style.display = (isF || isT) ? 'none' : '';
+  document.getElementById('tonlyBtn').textContent = planOnly ? '地図：全部表示' : '地図：予定だけ';
+  sortSel.querySelector('[value="pop"]').textContent = (isF || isT) ? '面積の大きい順' : '人口の多い順';
+  sortSel.querySelector('[value="kana"]').textContent = isT ? '回る順（近い順）' : '名前順';
+  if (isT) {
+    document.getElementById('reset').style.display = 'none';
+    const list = planned(pDate);
+    const ord = sortSel.value === 'pop' ? list.slice().sort((a, b) => (+b.area || 0) - (+a.area || 0)) : routeOrder(list);  // 基本は回る順
+    const dn = list.filter(f => f.st === 'done'), sa = a => a.reduce((x, f) => x + (+f.area || 0), 0);
+    document.getElementById('cnt').textContent = `📅 ${dlabel(pDate)}　完了 ${dn.length}/${list.length}枚` + (sa(list) ? `（${fmt(sa(dn))}/${fmt(sa(list))}a）` : '');
+    L2.innerHTML = ord.length ? ord.map((f, i) => { const s = stOf(f.st); return `<div class="row" data-f="${f.id}"><span class="ord">${i + 1}</span><span>${f.poly ? '⬠ ' : ''}${esc(f.name)}<br><span class="nl">${esc([f.work, f.crop].filter(Boolean).join('・'))}</span></span><span class="sub">${f.area ? fmt(f.area) + 'a' : ''}${dist({ pos:[f.la, f.ln] })}</span><button class="pbtn on" data-p="${f.id}" title="予定から外す">✕</button><button class="stb" data-s="${f.id}" style="background:${s.c}">${s.n}</button></div>`; }).join('')
+      : `<div class="row"><span>${dlabel(pDate)} の予定はまだありません。<br>「🌾圃場」タブの📅ボタン、または地図の圃場から「今日の予定へ」で追加できます。</span></div>`;
+    return;
+  }
+  document.getElementById('reset').style.display = (tab === 'town' || isF) ? '' : 'none';
+  document.getElementById('reset').textContent = isF ? '状態リセット' : 'チェック解除';
+  if (isF) {
+    const items = sortItems(fields.map(f => ({ name:f.name, pos:[f.la, f.ln], pop:+f.area || 0, f })));
+    const cnt = k => fields.filter(f => (f.st || 'todo') === k).length;
+    const area = fields.reduce((a, f) => a + (+f.area || 0), 0);
+    document.getElementById('cnt').textContent = `圃場 ${fields.length}枚（未${cnt('todo')}・中${cnt('doing')}・完${cnt('done')}）${area ? ' 計' + fmt(area) + 'a' : ''}`;
+    L2.innerHTML = items.length ? items.map(it => { const s = stOf(it.f.st); return `<div class="row" data-f="${it.f.id}"><span>${it.f.poly ? '⬠ ' : ''}${esc(it.name)}<br><span class="nl">${esc([it.f.crop, it.f.work].filter(Boolean).join('・'))}</span></span><span class="sub">${it.f.area ? fmt(it.f.area) + 'a' : ''}${dist(it)}</span><button class="pbtn ${it.f.plan === pDate ? 'on' : ''}" data-p="${it.f.id}" title="${dlabel(pDate)}の予定">📅</button><button class="stb" data-s="${it.f.id}" style="background:${s.c}">${s.n}</button></div>`; }).join('')
+      : '<div class="row"><span>まだ圃場がありません。右下の「圃場」を押して、地図をタップして登録してください。</span></div>';
+    return;
+  }
   if (tab === 'town') {
     const items = sortItems(TOWNS.map(([n, la, ln]) => ({ name:n, pos:[la, ln], pop:CENSUS[n]?.[0] })));
     document.getElementById('cnt').textContent = `${TOWNS.length}町（済 ${Object.keys(done).length}）`;
@@ -322,6 +419,12 @@ document.getElementById('tabs').onclick = e => {
 document.getElementById('list').onclick = e => {
   const c = e.target.closest('[data-c]');
   if (c) { toggleDone(c.dataset.c); return; }
+  const pb = e.target.closest('[data-p]');
+  if (pb) { const f = fById(pb.dataset.p); setPlan(f.id, f.plan === pDate ? '' : pDate); return; }
+  const sb = e.target.closest('[data-s]');
+  if (sb) { const f = fById(sb.dataset.s); setSt(f.id, nextSt(f.st)); return; }
+  const fr = e.target.closest('[data-f]');
+  if (fr) { goField(fr.dataset.f); return; }
   const r = e.target.closest('[data-n]');
   if (r) { const m = townMarkers[r.dataset.n]; map.flyTo(m.getLatLng(), 15); setTimeout(() => m.openPopup(), 800); return; }
   const k = e.target.closest('[data-k]');
@@ -331,12 +434,21 @@ sortSel.onchange = () => { if (sortSel.value === 'near' && !here) locateMe(rende
 document.getElementById('listBtn').onclick = () => { map.closePopup(); panel.classList.toggle('open'); renderList(); };
 document.getElementById('close').onclick = () => panel.classList.remove('open');
 document.getElementById('reset').onclick = () => {
+  if (tab === 'field') {
+    if (!confirm('全圃場の状態を「未着手」に戻しますか？\n（作業履歴は残ります）')) return;
+    fields.forEach(f => { if ((f.st || 'todo') !== 'todo') { f.st = 'todo'; f.upd = Date.now(); addLog(f, '未着手に戻す'); } });
+    saveF(); drawFields(); renderList(); return;
+  }
   if (!confirm('配送チェックをすべて解除しますか？')) return;
   done = {}; save();
   Object.keys(townMarkers).forEach(n => { townMarkers[n].setStyle({ fillColor:color(n) }); townMarkers[n].getTooltip().getElement()?.classList.remove('done'); });
   renderList();
 };
-map.on('click', () => { sug.style.display = 'none'; });
+map.on('click', e => {
+  sug.style.display = 'none';
+  // 圃場モード中：町・小字の丸印以外をタップしたら登録
+  if (fieldMode && !moveId && !drawing && e.originalEvent?.target?.tagName !== 'path') openFieldForm(null, e.latlng.lat, e.latlng.lng);
+});
 
 // ===== 市の「地区別人口世帯表」Excel 取り込み =====
 const nz = s => String(s ?? '').normalize('NFKC').replace(/[\s　]/g, '');
@@ -403,6 +515,331 @@ document.getElementById('mapply').onclick = () => {
 };
 document.getElementById('mrevert').onclick = () => { POPDATA = DEFAULT_POP; store.del('tahara-popdata-v2'); refreshPop(); document.getElementById('mcur').textContent = '現在のデータ：' + POPDATA.label; mres.textContent = '初期データに戻しました'; };
 if (typeof module !== 'undefined') module.exports = { parseTable };
+
+// ===== 🌾 圃場管理（Lv1：登録・状態の色分け・一覧・バックアップ） =====
+const FKEY = 'tahara-fields-v1';
+const ST = [{ k:'todo', n:'未着手', c:'#868e96' }, { k:'doing', n:'作業中', c:'#f08c00' }, { k:'done', n:'完了', c:'#2f9e44' }];
+const stOf = k => ST.find(s => s.k === k) || ST[0];
+const nextSt = k => ST[(ST.indexOf(stOf(k)) + 1) % ST.length].k;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const ymd = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`; };
+let fields = store.get(FKEY, []);
+const saveF = () => store.set(FKEY, fields);
+const fById = id => fields.find(f => f.id === id);
+// ===== 📅 作業予定（Lv3） =====
+const dstr = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const todayStr = () => dstr(new Date());
+const addDay = (ds, n) => { const d = new Date(ds + 'T00:00:00'); d.setDate(d.getDate() + n); return dstr(d); };
+const dlabel = ds => { const d = new Date(ds + 'T00:00:00'), t = todayStr(); const w = '日月火水木金土'[d.getDay()]; return `${d.getMonth() + 1}/${d.getDate()}(${w})` + (ds === t ? ' 今日' : ds === addDay(t, 1) ? ' 明日' : ds === addDay(t, -1) ? ' 昨日' : ''); };
+let pDate = todayStr(), planOnly = false;
+const planned = ds => fields.filter(f => f.plan === ds);
+const addLog = (f, txt) => { (f.log = f.log || []).unshift({ t:Date.now(), txt }); f.log.length = Math.min(f.log.length, 30); };
+const fLayer = L.layerGroup().addTo(map); let fMk = {};
+function fIcon(f) {
+  const s = stOf(f.st);
+  return L.divIcon({ className:'', iconSize:[28, 28], iconAnchor:[14, 14], popupAnchor:[0, -14],
+    html:`<div class="${planOnly && f.plan !== pDate ? 'fdim' : ''}"><div class="fpin" style="background:${s.c}">${f.plan === pDate ? '📅' : '🌾'}</div><div class="flbl${f.plan === pDate ? ' plbl' : ''}" style="border-color:${s.c};color:${s.c}">${esc(f.name)}</div></div>` });
+}
+// 面積（測地線で計算）→ ㎡
+function polyArea(pts) {
+  if (!pts || pts.length < 3) return 0;
+  const R = 6378137, rad = Math.PI / 180; let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [la1, ln1] = pts[i], [la2, ln2] = pts[(i + 1) % pts.length];
+    a += (ln2 - ln1) * rad * (2 + Math.sin(la1 * rad) + Math.sin(la2 * rad));
+  }
+  return Math.abs(a * R * R / 2);
+}
+const toA = m2 => Math.round(m2 / 10) / 10;                 // ㎡ → a（小数1桁）
+const aText = a => `${fmt(a)}a（約${(a / 9.917).toFixed(1)}反）`;
+const centroid = pts => [pts.reduce((s, p) => s + p[0], 0) / pts.length, pts.reduce((s, p) => s + p[1], 0) / pts.length];
+function drawFields() {
+  fLayer.clearLayers(); fMk = {};
+  fields.forEach(f => {
+    if (f.poly && f.poly.length >= 3) {
+      const s = stOf(f.st);
+      const pg = L.polygon(f.poly, { color:s.c, fillColor:s.c, fillOpacity:planOnly && f.plan !== pDate ? .06 : .32, opacity:planOnly && f.plan !== pDate ? .3 : 1, weight:f.plan === pDate ? 4 : 2.5, interactive:!drawing });  // 描画中はタップを通す
+      pg.bindPopup(() => fieldPopup(f.id));
+      fLayer.addLayer(pg);
+    }
+    const m = L.marker([f.la, f.ln], { icon:fIcon(f), zIndexOffset:500 });
+    m.bindPopup(() => fieldPopup(f.id));
+    fLayer.addLayer(m); fMk[f.id] = m;
+  });
+}
+function fieldPopup(id) {
+  const f = fById(id); if (!f) return '';
+  const s = stOf(f.st);
+  const rows = [['作物', f.crop], ['面積', f.area ? aText(+f.area) + (f.poly ? ' ⬠' : '') : ''], ['作業', f.work], ['予定', f.plan ? '📅 ' + dlabel(f.plan) : ''], ['メモ', f.memo]].filter(r => r[1]);
+  const t = todayStr(), tm = addDay(t, 1);
+  const pbtns = f.plan ? `<button class="pl" onclick="setPlan('${f.id}','')">予定から外す</button>`
+    : `<button class="pl" onclick="setPlan('${f.id}','${t}')">📅今日の予定へ</button><button class="pl" onclick="setPlan('${f.id}','${tm}')">明日</button>`;
+  const log = (f.log || []).slice(0, 3).map(l => `${ymd(l.t)} ${esc(l.txt)}`).join('<br>');
+  return `<div class="pop"><b>🌾 ${esc(f.name)}</b> <span class="stb" style="background:${s.c}">${s.n}</span>
+  ${rows.length ? `<table>${rows.map(r => `<tr><td>${r[0]}</td><td>${esc(r[1])}</td></tr>`).join('')}</table>` : ''}
+  <div>${ST.map(x => `<button class="sbtn" style="background:${x.c};${x.k === s.k ? 'outline:3px solid #333' : 'opacity:.75'}" onclick="setSt('${f.id}','${x.k}')">${x.n}</button>`).join('')}</div>
+  ${log ? `<div class="note" style="margin-top:6px">${log}</div>` : ''}
+  <div>${pbtns}</div>
+  <a href="${gmap(f.la, f.ln)}" target="_blank">ナビ</a>
+  <button style="background:#495057" onclick="editField('${f.id}')">編集</button></div>`;
+}
+function setSt(id, k) {
+  const f = fById(id); if (!f) return;
+  f.st = k; f.upd = Date.now(); addLog(f, stOf(k).n + (f.work ? '（' + f.work + '）' : ''));
+  saveF(); drawFields(); renderList();
+  if (!panel.classList.contains('open')) setTimeout(() => fMk[id]?.openPopup(), 50);
+}
+window.setSt = setSt;
+function setPlan(id, ds) {
+  const f = fById(id); if (!f) return;
+  f.plan = ds; f.upd = Date.now(); addLog(f, ds ? '予定 ' + dlabel(ds) : '予定解除');
+  saveF(); drawFields(); renderList();
+  if (!panel.classList.contains('open')) setTimeout(() => fMk[id]?.openPopup(), 50);
+  alertMsg(ds ? `「${f.name}」を ${dlabel(ds)} の予定に入れました` : `「${f.name}」を予定から外しました`);
+}
+window.setPlan = setPlan;
+// 予定の圃場を、現在地（なければ1枚目）から近い順につなぐ
+function routeOrder(list) {
+  const rest = list.slice(), out = [];
+  let cur = here || (rest[0] ? [rest[0].la, rest[0].ln] : null);
+  while (rest.length) {
+    let bi = 0, bd = 1e9;
+    rest.forEach((f, i) => { const d = km(cur[0], cur[1], f.la, f.ln); if (d < bd) { bd = d; bi = i; } });
+    const f = rest.splice(bi, 1)[0]; out.push(f); cur = [f.la, f.ln];
+  }
+  return out;
+}
+function daySummary(ds) {
+  const list = planned(ds);
+  const sum = arr => arr.reduce((a, f) => a + (+f.area || 0), 0);
+  const line = f => `・${f.name}${f.work ? '（' + f.work + '）' : ''}${f.area ? ' ' + fmt(f.area) + 'a' : ''}${f.memo ? ' ※' + f.memo : ''}`;
+  const out = [`【${dlabel(ds).replace(/ .+$/, '')} 圃場作業まとめ】`, `予定 ${list.length}枚${sum(list) ? '（計' + fmt(sum(list)) + 'a）' : ''}`];
+  ST.slice().reverse().forEach(st => {
+    const a = list.filter(f => (f.st || 'todo') === st.k);
+    if (a.length) out.push('', `■${st.n} ${a.length}枚${sum(a) ? '（' + fmt(sum(a)) + 'a）' : ''}`, ...a.map(line));
+  });
+  return out.join('\n');
+}
+function goField(id) {
+  const f = fById(id); if (!f) return;
+  if (f.poly && f.poly.length >= 3) map.flyToBounds(L.latLngBounds(f.poly).pad(0.6), { maxZoom:18 });
+  else map.flyTo([f.la, f.ln], 17);
+  setTimeout(() => fMk[id]?.openPopup(), 1000);
+}
+// 近くの小字から圃場名の候補を作る（例：浦町 川向）
+function guessName(la, ln) {
+  let b = '', bd = 1e9;
+  KOAZA.forEach(([ti, n, a, o]) => { const d = km(la, ln, a, o); if (d < bd) { bd = d; b = TOWNS[ti][0] + ' ' + n; } });
+  if (!b || bd > 1.5) return '';
+  const same = fields.filter(f => f.name.startsWith(b)).length;
+  return same ? `${b}${same + 1}` : b;
+}
+
+// 圃場モード
+let fieldMode = false;
+const fhint = document.getElementById('fhint');
+document.getElementById('fieldBtn').onclick = e => {
+  fieldMode = !fieldMode;
+  e.target.style.outline = fieldMode ? '3px solid #ffd43b' : '';
+  fhint.style.display = fieldMode ? 'flex' : 'none';
+  if (fieldMode && map.getZoom() < 15) alertMsg('拡大して、圃場の位置をタップしてください');
+};
+document.getElementById('fhere').onclick = () => locateMe(() => { map.flyTo(here, 17); openFieldForm(null, here[0], here[1]); });
+document.getElementById('fpoly').onclick = () => {
+  if (map.getZoom() < 16) alertMsg('もっと拡大すると正確に囲めます（航空写真がおすすめ）');
+  startDraw(poly => { if (!poly) return; const c = centroid(poly); openFieldForm(null, c[0], c[1], poly); });
+};
+
+// ===== ⬠ 形の描画 =====
+const dbar = document.getElementById('dbar'), dinfo = document.getElementById('dinfo');
+let drawing = null; // { pts, line, vx, cb }
+const dLayer = L.layerGroup().addTo(map);
+function startDraw(cb) {
+  map.closePopup();
+  drawing = { pts:[], cb };
+  drawFields();
+  fhint.style.display = 'none'; dbar.style.display = 'flex';
+  redrawTmp();
+}
+function redrawTmp() {
+  dLayer.clearLayers();
+  if (!drawing) return;
+  const p = drawing.pts;
+  if (p.length >= 2) L.polygon(p, { color:'#1971c2', weight:2, dashArray:'6 4', fillColor:'#4dabf7', fillOpacity:.25, interactive:false }).addTo(dLayer);
+  p.forEach(pt => L.marker(pt, { interactive:false, icon:L.divIcon({ className:'', html:'<div class="dvx"></div>', iconSize:[14, 14], iconAnchor:[7, 7] }) }).addTo(dLayer));
+  const a = toA(polyArea(p));
+  dinfo.textContent = p.length < 3 ? `⬠ 圃場の角を順にタップ（${p.length}点／3点以上）` : `⬠ ${p.length}点　面積 ${aText(a)}`;
+}
+function endDraw() { drawing = null; dLayer.clearLayers(); drawFields(); dbar.style.display = 'none'; if (fieldMode) fhint.style.display = 'flex'; }
+document.getElementById('dundo').onclick = () => { if (drawing) { drawing.pts.pop(); redrawTmp(); } };
+document.getElementById('dgps').onclick = () => locateMe(() => { if (!drawing) return; drawing.pts.push([here[0], here[1]]); map.panTo(here); redrawTmp(); });
+document.getElementById('dcancel').onclick = () => { const cb = drawing?.cb; endDraw(); cb && cb(null); };
+document.getElementById('dok').onclick = () => {
+  if (!drawing || drawing.pts.length < 3) { alertMsg('3点以上タップしてください'); return; }
+  const poly = drawing.pts.map(p => [+p[0].toFixed(7), +p[1].toFixed(7)]), cb = drawing.cb;
+  endDraw(); cb(poly);
+};
+map.on('click', e => {
+  if (!drawing) return;
+  drawing.pts.push([e.latlng.lat, e.latlng.lng]);
+  map.closePopup(); redrawTmp();
+});
+document.getElementById('fend').onclick = () => document.getElementById('fieldBtn').click();
+
+// 登録・編集フォーム
+const fmodal = document.getElementById('fmodal');
+let fEdit = null, fPos = null, fStSel = 'todo', fPoly = null;
+function paintSt() { document.querySelectorAll('#fst button').forEach(b => { const s = stOf(b.dataset.k); b.style.background = b.dataset.k === fStSel ? s.c : '#eee'; b.style.color = b.dataset.k === fStSel ? '#fff' : '#333'; }); }
+document.getElementById('fst').onclick = e => { const b = e.target.closest('[data-k]'); if (b) { fStSel = b.dataset.k; paintSt(); } };
+function shapeUI() {
+  document.getElementById('fshape').textContent = fPoly ? '⬠ 形を描き直す' : '⬠ 形を描く（面積を自動計算）';
+  document.getElementById('fareaNote').textContent = fPoly ? `囲んだ形の面積：${aText(toA(polyArea(fPoly)))}（${fPoly.length}点）` : '';
+  document.getElementById('fmove').style.display = fEdit && !fPoly ? '' : 'none';
+  document.getElementById('fpos').textContent = `位置：${fPos[0].toFixed(5)}, ${fPos[1].toFixed(5)}${fPoly ? '（形の中心）' : ''}`;
+}
+function openFieldForm(id, la, ln, poly) {
+  map.closePopup();
+  const f = id ? fById(id) : null;
+  fEdit = f ? f.id : null;
+  fPos = f ? [f.la, f.ln] : [la, ln];
+  fPoly = f ? (f.poly || null) : (poly || null);
+  fStSel = f ? (f.st || 'todo') : 'todo';
+  document.getElementById('ftitle').textContent = f ? '圃場の編集' : '圃場の登録';
+  document.getElementById('fname').value = f ? f.name : guessName(la, ln);
+  document.getElementById('fcrop').value = f?.crop || '';
+  document.getElementById('farea').value = f ? (f.area || '') : (fPoly ? toA(polyArea(fPoly)) : '');
+  document.getElementById('fwork').value = f?.work || '';
+  document.getElementById('fmemo').value = f?.memo || '';
+  document.getElementById('fplan').value = f?.plan || '';
+  document.getElementById('fpos').textContent = `位置：${fPos[0].toFixed(5)}, ${fPos[1].toFixed(5)}`;
+  document.getElementById('fdel').style.display = f ? '' : 'none';
+  shapeUI();
+  paintSt();
+  fmodal.classList.add('open');
+}
+window.editField = id => openFieldForm(id);
+document.getElementById('fshape').onclick = () => {
+  fmodal.classList.remove('open');
+  if (fPos) map.flyTo(fPos, Math.max(map.getZoom(), 17));
+  startDraw(poly => {
+    if (poly) {
+      fPoly = poly; fPos = centroid(poly);
+      document.getElementById('farea').value = toA(polyArea(poly));
+      if (!fEdit && !document.getElementById('fname').value) document.getElementById('fname').value = guessName(fPos[0], fPos[1]);
+    }
+    shapeUI(); fmodal.classList.add('open');
+  });
+};
+document.getElementById('fclose').onclick = () => fmodal.classList.remove('open');
+document.getElementById('fsave').onclick = () => {
+  const v = id => document.getElementById(id).value.trim();
+  const name = v('fname');
+  if (!name) { alert('圃場名を入れてください'); return; }
+  const data = { name, crop:v('fcrop'), area:v('farea'), work:v('fwork'), memo:v('fmemo'), plan:v('fplan'), st:fStSel, la:fPos[0], ln:fPos[1], poly:fPoly, upd:Date.now() };
+  let f;
+  if (fEdit) {
+    f = fById(fEdit);
+    const changed = (f.st || 'todo') !== fStSel || f.work !== data.work;
+    if ((f.plan || '') !== data.plan) addLog(f, data.plan ? '予定 ' + dlabel(data.plan) : '予定解除');
+    Object.assign(f, data);
+    if (changed) addLog(f, stOf(fStSel).n + (data.work ? '（' + data.work + '）' : ''));
+  } else {
+    f = { id:Date.now().toString(36), ...data, log:[] };
+    addLog(f, '登録');
+    fields.push(f);
+  }
+  saveF(); drawFields(); renderList();
+  fmodal.classList.remove('open');
+  alertMsg(`「${name}」を保存しました`);
+};
+document.getElementById('fdel').onclick = () => {
+  const f = fById(fEdit); if (!f || !confirm(`「${f.name}」を削除しますか？`)) return;
+  fields = fields.filter(x => x.id !== fEdit); saveF(); drawFields(); renderList();
+  fmodal.classList.remove('open');
+};
+// 位置の修正：次に地図をタップした場所へ移動
+let moveId = null;
+document.getElementById('fmove').onclick = () => { moveId = fEdit; fmodal.classList.remove('open'); alertMsg('新しい位置を地図でタップしてください'); };
+map.on('click', e => {
+  if (!moveId) return;
+  const f = fById(moveId); moveId = null; if (!f) return;
+  f.la = e.latlng.lat; f.ln = e.latlng.lng; f.upd = Date.now();
+  saveF(); drawFields(); alertMsg(`「${f.name}」の位置を移動しました`);
+});
+
+// バックアップ・復元・表コピー
+document.getElementById('fexp').onclick = () => {
+  const b = new Blob([JSON.stringify({ app:'tahara-fields', v:1, at:new Date().toISOString(), fields }, null, 1)], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+  a.download = `圃場データ_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+};
+document.getElementById('fimp').onclick = () => document.getElementById('ffile').click();
+document.getElementById('ffile').onchange = async e => {
+  const file = e.target.files[0]; if (!file) return;
+  try {
+    const d = JSON.parse(await file.text());
+    const arr = Array.isArray(d) ? d : d.fields;
+    if (!Array.isArray(arr)) throw new Error('形式が違います');
+    let add = 0, up = 0;
+    arr.forEach(x => { if (!x.id || x.la == null) return; const i = fields.findIndex(f => f.id === x.id); if (i >= 0) { fields[i] = x; up++; } else { fields.push(x); add++; } });
+    saveF(); drawFields(); renderList(); alertMsg(`復元：追加${add}件・更新${up}件`);
+  } catch (err) { alert('読み込めませんでした：' + err.message); }
+  e.target.value = '';
+};
+function copyText(t) {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(t).then(() => true, () => fallbackCopy(t));
+  return Promise.resolve(fallbackCopy(t));
+}
+function fallbackCopy(t) {
+  const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px';
+  document.body.appendChild(ta); ta.focus(); ta.setSelectionRange(0, t.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  ta.remove(); return ok;
+}
+document.getElementById('fcopy').onclick = async () => {
+  const head = ['圃場名', '作物', '面積(a)', '作業', '状態', 'メモ', '緯度', '経度', '形(点数)', '作業予定日', '更新'];
+  const rows = fields.map(f => [f.name, f.crop, f.area, f.work, stOf(f.st).n, f.memo, f.la.toFixed(6), f.ln.toFixed(6), f.poly ? f.poly.length : '', f.plan || '', f.upd ? new Date(f.upd).toLocaleString('ja-JP') : ''].map(x => String(x ?? '').replace(/[\t\n]/g, ' ')).join('\t'));
+  const ok = await copyText([head.join('\t'), ...rows].join('\n'));
+  alertMsg(ok ? '表をコピーしました（Notion・スプレッドシートに貼り付けOK）' : 'コピーできませんでした');
+};
+
+document.getElementById('fplanT').onclick = () => document.getElementById('fplan').value = todayStr();
+document.getElementById('fplanC').onclick = () => document.getElementById('fplan').value = '';
+const setPDate = ds => { pDate = ds; drawFields(); renderList(); };
+document.getElementById('tprev').onclick = () => setPDate(addDay(pDate, -1));
+document.getElementById('tnext').onclick = () => setPDate(addDay(pDate, 1));
+document.getElementById('ttoday').onclick = () => setPDate(todayStr());
+document.getElementById('tonlyBtn').onclick = () => { planOnly = !planOnly; drawFields(); renderList(); };
+document.getElementById('tsum').onclick = async () => {
+  if (!planned(pDate).length) return alertMsg('この日の予定がありません');
+  const ok = await copyText(daySummary(pDate));
+  alertMsg(ok ? 'まとめをコピーしました（LINE・Notionに貼り付けOK）' : 'コピーできませんでした');
+};
+document.getElementById('troute').onclick = () => {
+  const go = () => {
+    const r = routeOrder(planned(pDate).filter(f => f.st !== 'done'));
+    if (!r.length) return alertMsg('未完了の予定がありません');
+    const pt = f => `${f.la.toFixed(6)},${f.ln.toFixed(6)}`;
+    const last = r[Math.min(r.length, 10) - 1], mid = r.slice(0, Math.min(r.length, 10) - 1);
+    if (r.length > 10) alertMsg('Googleマップは10か所までなので、近い順に10枚でルートを作ります');
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${pt(last)}${mid.length ? '&waypoints=' + encodeURIComponent(mid.map(pt).join('|')) : ''}&travelmode=driving`, '_blank');
+  };
+  if (!here) locateMe(go); else go();
+};
+// 日付が変わったら（朝アプリを開き直したら）表示日を今日に
+document.addEventListener('visibilitychange', () => { if (!document.hidden && pDate !== todayStr() && tab !== 'today') setPDate(todayStr()); });
+
+drawFields();
+// 外部（AIハヤト等）から ?field=圃場名 ／ ?today=1 で開く
+(() => {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('today')) { tab = 'today'; document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x.dataset.t === 'today')); panel.classList.add('open'); renderList(); }
+  const want = qs.get('field');
+  if (!want) return;
+  const f = fields.find(x => x.name === want) || fields.find(x => x.name.includes(want));
+  if (f) setTimeout(() => goField(f.id), 600); else alertMsg(`圃場「${want}」が見つかりません`);
+})();
 
 // PWA用アイコン・マニフェスト（1ファイル完結）
 (function () {
